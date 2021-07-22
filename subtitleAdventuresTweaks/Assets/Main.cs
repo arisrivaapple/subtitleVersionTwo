@@ -35,6 +35,7 @@ namespace SubtitleSystem
         public Dictionary<string, Color> speakerColors;
         public TextAsset speakerColorDoc;
         public GameObject textBackground;
+        public Color currSpeaker Color;
 
         public TMP_FontAsset currFont;
 

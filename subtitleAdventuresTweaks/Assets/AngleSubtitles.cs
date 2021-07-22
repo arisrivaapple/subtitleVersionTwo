@@ -187,11 +187,12 @@ namespace SubtitleSystem
                         y = Compass.transform.rotation.y;
                         //negative speaker agles should have negative compass angle too
                         //modifying the Vector3, based on input multiplied by speed and time
-                        compassCurrentEulerAngles = new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle);
-                        //moving the value of the Vector3 into Quanternion.eulerAngle format
-                        compassCurrentRotation.eulerAngles = compassCurrentEulerAngles; //threw an error?
-                        //apply the Quaternion.eulerAngles change to the gameObject
-                        Compass.transform.rotation = compassCurrentRotation;
+                        UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
+                        UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
+                        UnityEngine.Debug.Log("x: " + x);
+                        UnityEngine.Debug.Log("y: " + y);
+
+                        Compass.transform.rotation = Quaternion.Euler( new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
                     }
                     if (mainCamr.GetComponent<Main>().attachSubtitles)
                     {
@@ -243,7 +244,7 @@ namespace SubtitleSystem
 
                             //modifying the Vector3, based on input multiplied by speed and time
                             compassCurrentEulerAngles = new Vector3(x, y, -speakerAngle);
-                            //moving the value of the Vector3 into Quanternion.eulerAngle format
+                            //moving the value of the Vector3 into Quanternion.eulerAngle formatpl
                             compassCurrentRotation.eulerAngles = compassCurrentEulerAngles;
 
                             //apply the Quaternion.eulerAngles change to the gameObject
@@ -373,11 +374,8 @@ namespace SubtitleSystem
                 Boolean AssignCol = GameObject.Find("Main Camera").GetComponent<Main>().assignedSpeakerColors;//have a final variable so ppl can chpoose the nam of their naim object?
                 if (AssignCol)
                 {
-                    //715-736 am 8-2-201`
-                    //946 - 1128am out
-                    //1237pm in 
                     string speakerString = subBase.subtitleReader.getSpeaker();
-                    Color speakerColor = subBase.tempUselessDictionary[speakerString];
+                    Color speakerColor = mainCamr.GetComponent<Main>().speakerColors[speakerString];
                     float alpha = 1.0f;
                     Gradient gradient = new Gradient();
                     gradient.SetKeys(
@@ -469,10 +467,22 @@ namespace SubtitleSystem
                 //just walk through the math agnle
                 //speaker angle is the nearest angle in this case
                 justSpeakerAngle = -(180.0f / Mathf.PI) * (Mathf.Atan((speakerX - playerX) / (speakerZ - playerZ)));
-                speakerAngleText.text = "og speaker angle: " + justSpeakerAngle;
-                speakerAngle = -justSpeakerAngle + player.GetComponent<MoveRobot>().playerYAngle;
+                if ((speakerZ - playerZ) == 0)
+                {
+                    if (speakerZ > 0)
+                    {
+                        justSpeakerAngle = 90.0f;
+                    }
+                    else
+                    {
+                        justSpeakerAngle = -90.0f;
+                    }
+                }
+                //speakerAngleText.text = "og speaker angle: " + justSpeakerAngle;
+                //speakerAngle = -justSpeakerAngle + player.GetComponent<MoveRobot>().playerYAngle;
+                UnityEngine.Debug.Log(player.GetComponent<MoveRobot>().playerYAngle);
                 playerYAngleText.text = ("play Y angle: " + player.GetComponent<MoveRobot>().playerYAngle);
-                totalFinalAngleText.text = "speaker minus play Y angle: " + speakerAngle;
+                //totalFinalAngleText.text = "speaker minus play Y angle: " + speakerAngle;
                 return fullCircleConvert(speakerAngle);
             }
             return 0.0f;
