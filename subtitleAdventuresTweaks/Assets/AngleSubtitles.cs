@@ -101,6 +101,8 @@ namespace SubtitleSystem
         public GameObject subtitleCanvasObject;
         public Canvas subtitleDisplay;
 
+
+        public GameObject compassBackground;
         //get rid of lingering text
 
         void Start()
@@ -145,7 +147,6 @@ namespace SubtitleSystem
                 Boolean subs = !(mainCamr.GetComponent<Main>().subtitlesOn);
                 if ((!triggeredOnce || repeated) && subs)
                 {
-
                     subBase = new SubtitleBase(subtitlesBox, subtitleFile);
                     subBase.assignDict();
                     subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed);
@@ -226,76 +227,44 @@ namespace SubtitleSystem
 
                     if (Speaker == null)
                     {
-                        speechBubble.SetActive(false);
-                        rightArrow.SetActive(false);
-                        leftArrow.SetActive(false);
                         speakerFaced = false;
-                        //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
-                        subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed);
+                        processSpeakerArrows(false, speakerPos);
+                        speechBubble.SetActive(false);
+                        subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed); //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
                         lightSpeaker(false);
                         changeText(false);
                         setCompass(false);
                     }
                     else
                     {
-                        if (mainCamr.GetComponent<Main>().subtitleBackground) { changeText(true); }
+                        //basic system functionality: player angle test a
                         speakerPos = playerViewContains(speakerTag, playerAngle);
-                        //tmeo change to test raycast
-                        //find a way to toggle the existence of th eif clause so this function can be turned on and off
-                        //could use nested if statwements but think clauses are cleeaner'
-                        //wpuld it make f=more sense just to have like seperate if clauses or a switch box for eahc setting?
-                        if (mainCamr.GetComponent<Main>().silhouettes)
+                        mostRecentSpeaker = Speaker;
+
+                        //various settings
+                        if (mainCamr.GetComponent<Main>().subtitleBackground) { changeText(true); } else { changeText(false); }//subtitle background
+                        if (mainCamr.GetComponent<Main>().showCompass) { setCompass(true); } else { setCompass(false); } //i can move these checks to helper methods but I think this is easier to see/understand?
+                        if (mainCamr.GetComponent<Main>().silhouettes) { showSilhouette(true); } else { showSilhouette(false); } //switch all setting clauses to alphabetical order?
+                        
+
+                        if (Equals("null", speakerPos))
                         {
-                            showSilhouette(true);
+                            throw new Exception("speaker is null but shouldnt be");
                         }
-                        if (Equals("true", speakerPos)) //what difference should there be between facing and seeing and just facing??
+                        else if (Equals("true", speakerPos)) //what difference should there be between facing and seeing and just facing??
                         {
                             speakerFaced = true;
-                            double tempor = mainCamr.GetComponent<Main>().speakerFacingSpeed;
                             subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed);
-                            rightArrow.SetActive(false);
-                            leftArrow.SetActive(false);
-
-                            lightSpeaker(true);
-                             //maybe change to baackground all the time when the setting is on? //this gives a void error sometimes???
+                            processSpeakerArrows(false, speakerPos);
+                            if (mainCamr.GetComponent<Main>().highlightSpeaker) { lightSpeaker(true); } else { lightSpeaker(false); }
                         }
-                        else if (!Equals("true", speakerPos))
+                        else //player not facing speaker
                         {
-                            if (speakerArrows)
-                            {
-                                if (Equals("left", speakerPos))
-                                {
-                                    rightArrow.SetActive(false);
-                                    leftArrow.SetActive(true);
-                                }
-                                else if (Equals("right", speakerPos))
-                                {
-                                    rightArrow.SetActive(true);
-                                    leftArrow.SetActive(false);
-                                }
-                            }
                             speakerFaced = false;
-                            double tempor = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed;
-                            subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed);
-                            lightSpeaker(false);
-                            changeText(false); //subtitle background
+                            lightSpeaker(false); //not facing speaker so all lights off whether triggered or not
+                            if (mainCamr.GetComponent<Main>().slowGameWhenNotLookingAtSpeaker) { subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed); } 
+                            if (mainCamr.GetComponent<Main>().showSpeakerArrows) { processSpeakerArrows(true, speakerPos); } else {processSpeakerArrows(true, speakerPos); } // subtitle background
                         }
-
-                        if (mainCamr.GetComponent<Main>().showCompass)
-                        {
-                            Compass.SetActive(true);
-
-                            x = Compass.transform.rotation.x;
-                            y = Compass.transform.rotation.y;
-
-                            UnityEngine.Debug.Log("speakerAngle: " + speakerAngle);
-                            UnityEngine.Debug.Log("x: " + x);
-                            UnityEngine.Debug.Log("y: " + y);
-
-                            //apply the Quaternion.eulerAngles change to the gameObject
-                            Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, -speakerAngle));
-                        }
-                        mostRecentSpeaker = Speaker;
                     }
 
                     if (subBase.subtitleReader.shouldProgramEnd())
@@ -319,7 +288,7 @@ namespace SubtitleSystem
 
         public void attachSubtitles()
         {
-            if (player != null && Speaker != null)
+            if (!subBase.subtitleReader.shouldProgramEnd() && player != null && Speaker != null)
             {
                 //i could seperate each kind of subtitles into classes, for user readability, but it seems more convent for the user to _use_ if they're in one class, where you can _pick_ the features
                 Boolean AssignCol = GameObject.Find("Main Camera").GetComponent<Main>().assignedSpeakerColors;//have a final variable so ppl can chpoose the nam of their naim object?
@@ -345,19 +314,10 @@ namespace SubtitleSystem
                 line.SetPosition(1, player.transform.position);
 
             }
-            else
-            {
-
-                line.startWidth = 0.0F;
-                line.endWidth = 0.0F;
-
-            }
-
-            if (subBase.subtitleReader.shouldProgramEnd())
+            else //if no one is speaker OR if the program should end
             {
                 line.startWidth = 0.0F;
                 line.endWidth = 0.0F;
-
             }
         }
 
@@ -574,10 +534,38 @@ namespace SubtitleSystem
             return false;
         }
 
-        public void setCompass
+        public void setCompass (Boolean setting)
         {
+            if (setting)
+            {
 
 
+            }
+            Compass.SetActive(setting);
+            compassBackground.SetActive(setting);
+
+        }
+
+        public void processSpeakerArrows(Boolean setting, string speakerPos)
+        {
+            if (setting)
+            {
+                if (Equals("left", speakerPos))
+                {
+                    rightArrow.SetActive(false);
+                    leftArrow.SetActive(true);
+                }
+                else if (Equals("right", speakerPos))
+                {
+                    rightArrow.SetActive(true);
+                    leftArrow.SetActive(false);
+                }
+            }
+            else
+            {
+                rightArrow.SetActive(false);
+                leftArrow.SetActive(false);
+            }
         }
     }
 }

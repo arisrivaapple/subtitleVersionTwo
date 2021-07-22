@@ -2917,12 +2917,6 @@ MonoBehaviour:
   Compass: {fileID: 1771556831}
   compassCurrentEulerAngles: {x: 0, y: 0, z: 0}
   compassCurrentRotation: {x: 0, y: 0, z: 0, w: 0}
-  Compass2: {fileID: 0}
-  compassCurrentEulerAngles2: {x: 0, y: 0, z: 0}
-  compassCurrentRotation2: {x: 0, y: 0, z: 0, w: 0}
-  Compass3: {fileID: 0}
-  compassCurrentEulerAngles3: {x: 0, y: 0, z: 0}
-  compassCurrentRotation3: {x: 0, y: 0, z: 0, w: 0}
   subtitleFile: {fileID: 4900000, guid: f1af11c31edced94295c47959efcb931, type: 3}
   justSpeakerAngle: 0
   defaultFloat: 0
@@ -2956,6 +2950,7 @@ MonoBehaviour:
   y: 0
   subtitleCanvasObject: {fileID: 1147454512}
   subtitleDisplay: {fileID: 0}
+  compassBackground: {fileID: 887734017}
 --- !u!1 &770578729
 GameObject:
   m_ObjectHideFlags: 0
@@ -3589,6 +3584,7 @@ MonoBehaviour:
   subtitleDisplay: {fileID: 1147454515}
   speakerColorDoc: {fileID: 4900000, guid: d1bba3ea53ce39e47b765dd4502d7a15, type: 3}
   textBackground: {fileID: 1483140398}
+  speakerColor: {r: 0, g: 0, b: 0, a: 0}
   currFont: {fileID: 11400000, guid: e331e7f5f04f8944c897c7d01ea9adba, type: 2}
   subtitlesOn: 0
 --- !u!1 &1034558984
