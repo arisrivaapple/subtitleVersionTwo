@@ -63,6 +63,7 @@ namespace SubtitleSystem
                             speakerTemp = subtitleReader.getSpeaker();
                             if (mainc.GetComponent<Main>().assignedSpeakerColors)
                             {
+                                mainc.GetComponent<Main>().speakerColor = tempUselessDictionary[speakerTemp];
                                 subBox.color = tempUselessDictionary[speakerTemp];
                             }
                         }

@@ -41,12 +41,6 @@ namespace SubtitleSystem
         public GameObject Compass;
         public Vector3 compassCurrentEulerAngles;
         public Quaternion compassCurrentRotation;
-        public GameObject Compass2;
-        public Vector3 compassCurrentEulerAngles2;
-        public Quaternion compassCurrentRotation2;
-        public GameObject Compass3;
-        public Vector3 compassCurrentEulerAngles3;
-        public Quaternion compassCurrentRotation3;//can get a similar arrow thing by getting directions of raycast..
         public TextAsset subtitleFile;
         public SubtitleBase subBase;
         public float justSpeakerAngle;
@@ -198,8 +192,7 @@ namespace SubtitleSystem
                     {
                         attachSubtitles();
                     }
-                    subBase.UpdateSubtitleBase();
-                    //do our counters and time adjustments match up?
+                    subBase.UpdateSubtitleBase(); //do our counters and time adjustments match up?
 
                     speakerTag = subBase.subtitleReader.getSpeaker();//hmmmm
                     Speaker = GameObject.Find(speakerTag);
@@ -223,50 +216,14 @@ namespace SubtitleSystem
                             //modifying the Vector3, based on input multiplied by speed and time
                             speakerCurrentEulerAngles = new Vector3(0, 0, Compass.transform.rotation.z);//heck if theres initital rotation
 
-                            //moving the value of the Vector3 into Quanternion.eulerAngle format
-                            speakerCurrentRotation.eulerAngles = speakerCurrentEulerAngles;
-
                             //apply the Quaternion.eulerAngles change to the gameObject
-                            speechBubble.transform.rotation = speakerCurrentRotation;
+                            speechBubble.transform.rotation = Quaternion.Euler(speakerCurrentEulerAngles);
                         }
                         
                         showSilhouette(false);
                     }
-                    if (Speaker != null)
-                    {
 
-                        if (mainCamr.GetComponent<Main>().showCompass)
-                        {
-                            Compass.SetActive(true);
 
-                            x = Compass.transform.rotation.x;
-                            y = Compass.transform.rotation.y;
-
-                            //modifying the Vector3, based on input multiplied by speed and time
-                            compassCurrentEulerAngles = new Vector3(x, y, -speakerAngle);
-                            //moving the value of the Vector3 into Quanternion.eulerAngle formatpl
-                            compassCurrentRotation.eulerAngles = compassCurrentEulerAngles;
-
-                            //apply the Quaternion.eulerAngles change to the gameObject
-                            Compass.transform.rotation = compassCurrentRotation;
-
-                            y = Compass2.transform.rotation.y;
-                            compassCurrentEulerAngles2 = new Vector3(x, y, justSpeakerAngle);
-                            //moving the value of the Vector3 into Quanternion.eulerAngle format
-                            compassCurrentRotation2.eulerAngles = compassCurrentEulerAngles2;
-                            //apply the Quaternion.eulerAngles change to the gameObject
-                            Compass2.transform.rotation = compassCurrentRotation2;
-
-                            y = Compass3.transform.rotation.y;
-                            compassCurrentEulerAngles3 = new Vector3(x, y, player.GetComponent<MoveRobot>().playerYAngle);
-                            //moving the value of the Vector3 into Quanternion.eulerAngle format
-                            compassCurrentRotation3.eulerAngles = compassCurrentEulerAngles3;
-                            //apply the Quaternion.eulerAngles change to the gameObject
-                            Compass3.transform.rotation = compassCurrentRotation3;
-
-                        }
-                        mostRecentSpeaker = Speaker;
-                    } //does it need to go after too?
                     if (Speaker == null)
                     {
                         speechBubble.SetActive(false);
@@ -277,10 +234,12 @@ namespace SubtitleSystem
                         subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed);
                         lightSpeaker(false);
                         changeText(false);
-                        //Compass.SetActive(false);
+                        setCompass(false);
                     }
                     else
                     {
+                        if (mainCamr.GetComponent<Main>().subtitleBackground) { changeText(true); }
+                        speakerPos = playerViewContains(speakerTag, playerAngle);
                         //tmeo change to test raycast
                         //find a way to toggle the existence of th eif clause so this function can be turned on and off
                         //could use nested if statwements but think clauses are cleeaner'
@@ -289,8 +248,7 @@ namespace SubtitleSystem
                         {
                             showSilhouette(true);
                         }
-                        speakerPos = playerViewContains(speakerTag, playerAngle);
-                        if (Equals("true", speakerPos) && (checkVisualSpeaker()))
+                        if (Equals("true", speakerPos)) //what difference should there be between facing and seeing and just facing??
                         {
                             speakerFaced = true;
                             double tempor = mainCamr.GetComponent<Main>().speakerFacingSpeed;
@@ -299,52 +257,45 @@ namespace SubtitleSystem
                             leftArrow.SetActive(false);
 
                             lightSpeaker(true);
-                            if (mainCamr.GetComponent<Main>().subtitleBackground) //maybe  change to baackground all the time when the setting is on?
-                            {
-                                changeText(true);
-                            }
-                            //this gives a void error sometimes???
-
+                             //maybe change to baackground all the time when the setting is on? //this gives a void error sometimes???
                         }
-                        else if (checkVisualSpeaker()) //im wondeing if you should only swith to spekwerFacingSpeed if you can see a significent percentage of the speaker
-                                                       //i think that would be harder to code though
+                        else if (!Equals("true", speakerPos))
                         {
-                            if (Equals("left", speakerPos))
+                            if (speakerArrows)
                             {
-                                rightArrow.SetActive(false);
-                                leftArrow.SetActive(true);
-                            }
-                            else if (Equals("right", speakerPos))
-                            {
-                                rightArrow.SetActive(true);
-                                leftArrow.SetActive(false);
-                            }
-                        }
-                        else
-                        {
-                            if (!Equals("true", speakerPos))
-                            {
-                                speakerFaced = false;
-                                //could just have a fiunction that did all the updates related to speakerFaced?
-                                double tempor = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed;
-                                subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed);
-                                if (speakerArrows)
+                                if (Equals("left", speakerPos))
                                 {
-                                    if (Equals("left", speakerPos))
-                                    {
-                                        rightArrow.SetActive(false);
-                                        leftArrow.SetActive(true);
-                                    }
-                                    else
-                                    {
-                                        rightArrow.SetActive(true);
-                                        leftArrow.SetActive(false);
-                                    }
+                                    rightArrow.SetActive(false);
+                                    leftArrow.SetActive(true);
                                 }
-                                lightSpeaker(false);
-                                changeText(false);
+                                else if (Equals("right", speakerPos))
+                                {
+                                    rightArrow.SetActive(true);
+                                    leftArrow.SetActive(false);
+                                }
                             }
+                            speakerFaced = false;
+                            double tempor = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed;
+                            subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed);
+                            lightSpeaker(false);
+                            changeText(false); //subtitle background
                         }
+
+                        if (mainCamr.GetComponent<Main>().showCompass)
+                        {
+                            Compass.SetActive(true);
+
+                            x = Compass.transform.rotation.x;
+                            y = Compass.transform.rotation.y;
+
+                            UnityEngine.Debug.Log("speakerAngle: " + speakerAngle);
+                            UnityEngine.Debug.Log("x: " + x);
+                            UnityEngine.Debug.Log("y: " + y);
+
+                            //apply the Quaternion.eulerAngles change to the gameObject
+                            Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, -speakerAngle));
+                        }
+                        mostRecentSpeaker = Speaker;
                     }
 
                     if (subBase.subtitleReader.shouldProgramEnd())
@@ -375,7 +326,7 @@ namespace SubtitleSystem
                 if (AssignCol)
                 {
                     string speakerString = subBase.subtitleReader.getSpeaker();
-                    Color speakerColor = mainCamr.GetComponent<Main>().speakerColors[speakerString];
+                    Color speakerColor = mainCamr.GetComponent<Main>().speakerColor;
                     float alpha = 1.0f;
                     Gradient gradient = new Gradient();
                     gradient.SetKeys(
@@ -421,24 +372,18 @@ namespace SubtitleSystem
             {
                 mostRecentSpeaker.GetComponent<Renderer>().material = nonSilhouetteMaterial;
             }
-
         }
 
         public Boolean checkVisualSpeaker()
         {
-            //i think givent he functionality i want, i can just replace playeranglecontains with raycast, plus add show soluette and i wont need to amake any tother changes
-            if (needToSeeSpeaker)
+            if (doesRaycastHitSpeaker())
             {
-                if (doesRaycastHitSpeaker())
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
-            return true;
+            else
+            {
+                return false;
+            }
         }
 
         public float processAngle(float prevAngle)
@@ -463,10 +408,9 @@ namespace SubtitleSystem
                 speakerX = Speaker.transform.position.x;
                 playerZ = player.transform.position.z;
                 playerX = player.transform.position.x;
-                UnityEngine.Debug.Log(speakerAngle);
-                //just walk through the math agnle
-                //speaker angle is the nearest angle in this case
+                
                 justSpeakerAngle = -(180.0f / Mathf.PI) * (Mathf.Atan((speakerX - playerX) / (speakerZ - playerZ)));
+                
                 if ((speakerZ - playerZ) == 0)
                 {
                     if (speakerZ > 0)
@@ -478,13 +422,12 @@ namespace SubtitleSystem
                         justSpeakerAngle = -90.0f;
                     }
                 }
-                //speakerAngleText.text = "og speaker angle: " + justSpeakerAngle;
-                //speakerAngle = -justSpeakerAngle + player.GetComponent<MoveRobot>().playerYAngle;
+                UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
                 UnityEngine.Debug.Log(player.GetComponent<MoveRobot>().playerYAngle);
                 playerYAngleText.text = ("play Y angle: " + player.GetComponent<MoveRobot>().playerYAngle);
-                //totalFinalAngleText.text = "speaker minus play Y angle: " + speakerAngle;
                 return fullCircleConvert(speakerAngle);
             }
+            UnityEngine.Debug.Log("speaker null: ");
             return 0.0f;
         }
 
@@ -504,37 +447,39 @@ namespace SubtitleSystem
                 playerZ = player.transform.position.z;
                 playerX = player.transform.position.x;
                 speakerAngle = (180.0f / Mathf.PI) * (Mathf.Atan(Math.Abs(speakerZ - playerZ) / Math.Abs(speakerX - playerX)));
-                speakerAngle = fullCircleConvert(speakerAngle);
-                playerAngle += player.transform.rotation.z;
+                speakerAngle %= (360.0f);
+                playerAngle = player.transform.rotation.z % (360.0f);
                 //the coefficent converst it to degrees, which i think are easier to sdeall with in grid form
                 //perhaps try to trouble shoot by puttingn aline at the player angle angle??
-                float temp1 = (playerAngle - allowance);
-                float temp2 = (playerAngle + allowance);
-                float test1 = temp1 % (360.0f);
-                float test2 = temp2 % (360.0f);
-                if (speakerAngle >= (float)test1)
+                if ((speakerAngle - playerAngle)>180.0f)
                 {
-                    if (speakerAngle <= (float)test2)
-                    {
-                        return "true";
-                    }
-                    else
-                    {
-                        return "left";
-                    }
+                    playerAngle += 360.0f;
+                }
+                else if ((speakerAngle - playerAngle) < -180.0f)
+                {
+                    speakerAngle += 360.0f;
+                }
+
+                if (Math.Abs(playerAngle - speakerAngle) <= allowance)
+                {
+                    return "true";
+                }
+                else if (playerAngle - speakerAngle > 0.0f)
+                { 
+                    return "right";
+                }
+                else
+                {
+                    return "left";
                 }
             }
-            return "right";
+            return "null"; //as in seaker null
             //use raycast? so its clear that the player has a direct line of site to the speaker?
             //though, an alternative would be to ust have player.foward +- allowance == angle between player and speaker
             //which would be useful if speakers were behind objects...
             //alternativelyy, if the speakers were behind objects, there could be a silloette of the speaker
             //perhaps that could be toggled on and of*/ 
         }
-
-        /*Boolean isSpeakerOnLeft()
-        {
-        }*/
 
         public float fullCircleConvert(float origAngle)
         {
@@ -627,6 +572,12 @@ namespace SubtitleSystem
             //UnityEngine.Debug.DrawRay(player.transform.position, player.transform.TransformDirection(Vector3.forward) * 1000, Color.white);
             //UnityEngine.Debug.Log("Did not Hit");
             return false;
+        }
+
+        public void setCompass
+        {
+
+
         }
     }
 }
