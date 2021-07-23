@@ -61,6 +61,7 @@ namespace SubtitleSystem
         public float speakerZ;
         public float speakerX;
         public float playerZ;
+        public TextMeshProUGUI speedText;
         public GameObject mostRecentSpeakerLight;
         public GameObject speechBubble;
         public float playerX;
@@ -160,6 +161,7 @@ namespace SubtitleSystem
 
         void Update()
         {
+            speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
             speakerAngle = getSpeakerAngle();
             if (mostRecentSpeaker != Speaker) { showSilhouette(false);}
 
@@ -171,7 +173,7 @@ namespace SubtitleSystem
 
                 if (subtitlesTriggered)
                 {
-                    if (mainCamr.GetComponent<Main>().showCompass)) { setCompass(justSpeakerAngle, true); }
+                    if (mainCamr.GetComponent<Main>().showCompass) { setCompass(true); }
                     if (mainCamr.GetComponent<Main>().attachSubtitles) { attachSubtitles(); }
                     
                     subBase.UpdateSubtitleBase(); //do our counters and time adjustments match up?
@@ -208,7 +210,7 @@ namespace SubtitleSystem
                     if (Speaker == null)
                     {
                         speakerFaced = false;
-                        processSpeakerArrows(false, speakerPos);
+                        processSpeakerArrows(false);
                         speechBubble.SetActive(false);
                         subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed); //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
                         lightSpeaker(false);
