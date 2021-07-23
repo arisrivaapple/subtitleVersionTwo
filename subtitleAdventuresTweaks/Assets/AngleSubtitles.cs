@@ -31,7 +31,7 @@ namespace SubtitleSystem
         //ive always had a bit of toruble with scope
         //shouof check the scope of everythign to seee that nothing is brpader scope than it needs to be so it doesnt interfere t=with the user's rpogram
         private LineRenderer line;
-        public TextMeshProUGUI speakerAngleText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
+        public TextMeshProUGUI speakerAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
         public GameObject leftArrow;
         public GameObject rightArrow;
         public Boolean speakerArrows;
@@ -161,16 +161,17 @@ namespace SubtitleSystem
 
         void Update()
         {
-            speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
+            
             speakerAngle = getSpeakerAngle();
             if (mostRecentSpeaker != Speaker) { showSilhouette(false);}
 
             if (subBase != null) //order of checking most recent and assigneing speaker conflicts?
             {
+                speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
                 subBase.subtitleReader.incrementTime();
                 playerAngle = processAngle(player.GetComponent<MoveRobot>().playerYAngle);
                 String speakerPos = playerViewContains(speakerTag, playerAngle);
-
+                speakerPosText.text = "speakerPos: " + speakerPos;
                 if (subtitlesTriggered)
                 {
                     if (mainCamr.GetComponent<Main>().showCompass) { setCompass(true); }
@@ -210,7 +211,7 @@ namespace SubtitleSystem
                     if (Speaker == null)
                     {
                         speakerFaced = false;
-                        processSpeakerArrows(false);
+                        processSpeakerArrows(false, speakerPos);
                         speechBubble.SetActive(false);
                         subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed); //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
                         lightSpeaker(false);
@@ -220,6 +221,7 @@ namespace SubtitleSystem
                     else
                     {
                         //basic system functionality: player angle test a
+                        speakerAngle = getSpeakerAngle();
                         speakerPos = playerViewContains(speakerTag, playerAngle);
                         mostRecentSpeaker = Speaker;
 
@@ -344,6 +346,7 @@ namespace SubtitleSystem
 
         public float getSpeakerAngle()
         {
+            //replace "if speaker is not null" with "if subtitles should not end"
             if (Speaker != null) //it entered this if satemnt when it wasnt supposed to??!!
             {
                 speakerZ = Speaker.transform.position.z;
@@ -364,9 +367,14 @@ namespace SubtitleSystem
                         justSpeakerAngle = -90.0f;
                     }
                 }
-                UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
+                speakerAngleText.text = ("justSpeakerAngle: " + justSpeakerAngle);
                 UnityEngine.Debug.Log(player.GetComponent<MoveRobot>().playerYAngle);
-                playerYAngleText.text = ("play Y angle: " + player.GetComponent<MoveRobot>().playerYAngle);
+                float tempPlayerAngle = ((360 / (2 * Mathf.PI) * player.transform.rotation.y % (360.0f)));
+                if (tempPlayerAngle < 0)
+                {
+                    tempPlayerAngle += 360.0f;
+                }
+                playerYAngleText.text = "play Y angle: " + tempPlayerAngle;
                 return fullCircleConvert(speakerAngle);
             }
             UnityEngine.Debug.Log("speaker null: ");
@@ -377,7 +385,7 @@ namespace SubtitleSystem
         public String playerViewContains(string speakerName, float playerAngle)
         {
             ///ugh!! i could include both of the answers in the stirng to return
-            ///ibut i think the most elegant would be to include the compass shit in HERE
+            ///ibut i think the most elegant would be to include the compass shyerAngleit in HERE
             ///GRar
             ///i mean what if we like seeprate this class into angle subtitles main setting class and helper classes...
             ///in an attemot to do this, i exported the version _Before_ attempting this on 1/21/2021, labeled and COmplexSubtitleSystem with said date
@@ -388,8 +396,8 @@ namespace SubtitleSystem
                 speakerX = Speaker.transform.position.x;
                 playerZ = player.transform.position.z;
                 playerX = player.transform.position.x;
-                speakerAngle = (180.0f / Mathf.PI) * (Mathf.Atan(Math.Abs(speakerZ - playerZ) / Math.Abs(speakerX - playerX)));
-                speakerAngle %= (360.0f);
+                //speakerAngle = (180.0f / Mathf.PI) * (Mathf.Atan(Math.Abs(speakerZ - playerZ) / Math.Abs(speakerX - playerX)));
+                //speakerAngle %= (360.0f);
                 playerAngle = player.transform.rotation.z % (360.0f);
                 //the coefficent converst it to degrees, which i think are easier to sdeall with in grid form
                 //perhaps try to trouble shoot by puttingn aline at the player angle angle??
@@ -406,7 +414,7 @@ namespace SubtitleSystem
                 {
                     return "true";
                 }
-                else if (playerAngle - speakerAngle > 0.0f)
+                else if ((playerAngle - speakerAngle) > 0.0f)
                 { 
                     return "right";
                 }
@@ -573,6 +581,11 @@ namespace SubtitleSystem
                 else if (Equals("right", speakerPos))
                 {
                     rightArrow.SetActive(true);
+                    leftArrow.SetActive(false);
+                }
+                else
+                {
+                    rightArrow.SetActive(false);
                     leftArrow.SetActive(false);
                 }
             }
