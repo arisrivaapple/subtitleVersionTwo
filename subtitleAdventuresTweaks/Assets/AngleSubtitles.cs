@@ -368,6 +368,7 @@ namespace SubtitleSystem
                     }
                 }
                 speakerAngleText.text = ("justSpeakerAngle: " + justSpeakerAngle);
+                speakerAngle = justSpeakerAngle;
                 UnityEngine.Debug.Log(360.0f - (player.transform.rotation.y % (360.0f)));
                 //float tempPlayerAngle = ((360 / (2 * Mathf.PI) * player.transform.rotation.y % (360.0f)));
                 //if (tempPlayerAngle < 0)
