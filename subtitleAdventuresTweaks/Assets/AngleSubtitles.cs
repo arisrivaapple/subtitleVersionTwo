@@ -160,41 +160,21 @@ namespace SubtitleSystem
 
         void Update()
         {
-            getSpeakerAngle();
-            if (mostRecentSpeaker != Speaker) 
-            {
-                showSilhouette(false);
-            }
+            speakerAngle = getSpeakerAngle();
+            if (mostRecentSpeaker != Speaker) { showSilhouette(false);}
+
             if (subBase != null) //order of checking most recent and assigneing speaker conflicts?
             {
                 subBase.subtitleReader.incrementTime();
-
-                internalTimeRate = subBase.subtitleReader.getInternalTimerRate();
-                internalTime = subBase.subtitleReader.getInternalTime();
                 playerAngle = processAngle(player.GetComponent<MoveRobot>().playerYAngle);
                 String speakerPos = playerViewContains(speakerTag, playerAngle);
+
                 if (subtitlesTriggered)
                 {
-                    if (justSpeakerAngle != defaultFloat)
-                    {
-                        getSpeakerAngle();
-                        x = Compass.transform.rotation.x;
-                        y = Compass.transform.rotation.y;
-                        //negative speaker agles should have negative compass angle too
-                        //modifying the Vector3, based on input multiplied by speed and time
-                        UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
-                        UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
-                        UnityEngine.Debug.Log("x: " + x);
-                        UnityEngine.Debug.Log("y: " + y);
-
-                        Compass.transform.rotation = Quaternion.Euler( new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
-                    }
-                    if (mainCamr.GetComponent<Main>().attachSubtitles)
-                    {
-                        attachSubtitles();
-                    }
+                    if (mainCamr.GetComponent<Main>().showCompass)) { setCompass(justSpeakerAngle, true); }
+                    if (mainCamr.GetComponent<Main>().attachSubtitles) { attachSubtitles(); }
+                    
                     subBase.UpdateSubtitleBase(); //do our counters and time adjustments match up?
-
                     speakerTag = subBase.subtitleReader.getSpeaker();//hmmmm
                     Speaker = GameObject.Find(speakerTag);
                     
@@ -263,7 +243,7 @@ namespace SubtitleSystem
                             speakerFaced = false;
                             lightSpeaker(false); //not facing speaker so all lights off whether triggered or not
                             if (mainCamr.GetComponent<Main>().slowGameWhenNotLookingAtSpeaker) { subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed); } 
-                            if (mainCamr.GetComponent<Main>().showSpeakerArrows) { processSpeakerArrows(true, speakerPos); } else {processSpeakerArrows(true, speakerPos); } // subtitle background
+                            if (mainCamr.GetComponent<Main>().showSpeakerArrows) { processSpeakerArrows(true, speakerPos); } else {processSpeakerArrows(false, speakerPos); } // subtitle background
                         }
                     }
 
@@ -534,15 +514,48 @@ namespace SubtitleSystem
             return false;
         }
 
-        public void setCompass (Boolean setting)
+        //idk if i need this second one
+        public void setCompass (string SpeakerPos, Boolean setting)
         {
             if (setting)
             {
+                //if (justSpeakerAngle != defaultFloat)  idk what i had this for im seein what happens without it
+                x = Compass.transform.rotation.x;
+                y = Compass.transform.rotation.y;
+                //negative speaker agles should have negative compass angle too
+                //modifying the Vector3, based on input multiplied by speed and time
+                UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
+                UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
+                UnityEngine.Debug.Log("x: " + x);
+                UnityEngine.Debug.Log("y: " + y);
+                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
+                
+            }
+            Compass.SetActive(setting);
+            compassBackground.SetActive(setting);
 
+
+        }
+
+        public void setCompass(Boolean setting)
+        {
+            if (setting)
+            {
+                //if (justSpeakerAngle != defaultFloat)  idk what i had this for im seein what happens without it
+                x = Compass.transform.rotation.x;
+                y = Compass.transform.rotation.y;
+                //negative speaker agles should have negative compass angle too
+                //modifying the Vector3, based on input multiplied by speed and time
+                UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
+                UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
+                UnityEngine.Debug.Log("x: " + x);
+                UnityEngine.Debug.Log("y: " + y);
+                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
 
             }
             Compass.SetActive(setting);
             compassBackground.SetActive(setting);
+
 
         }
 
