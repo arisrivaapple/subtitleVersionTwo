@@ -31,7 +31,7 @@ namespace SubtitleSystem
         //ive always had a bit of toruble with scope
         //shouof check the scope of everythign to seee that nothing is brpader scope than it needs to be so it doesnt interfere t=with the user's rpogram
         private LineRenderer line;
-        public TextMeshProUGUI speakerAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
+        public TextMeshProUGUI speakerAngleText, playerZAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
         public GameObject leftArrow;
         public GameObject rightArrow;
         public Boolean speakerArrows;
@@ -120,7 +120,7 @@ namespace SubtitleSystem
             //HERE THE CODE SHOULD BE EDITED DEPENDING ON WHAT PLAYER MOVEMENT YOU USE
             //"plsyerAngle" SHOULD CONTAIN THE PLAYERS ROTATION AORUND THE Y AXIS IN DEGREES
             //for our functionality: dont forget to write the code to keep our playerRotstion w=under 360 degrees and correctlky formatted
-            playerAngle = player.GetComponent<MoveRobot>().playerYAngle;//will this update as the variable updates?
+            playerAngle = player.GetComponent<MoveRobot>().playerYAngle * 360.0f;//will this update as the variable updates?
             //i dont think so
             //decide if we want another class for the basic sbtitle displaer stuff
             ///we assume that initially the player isnt facing the speaker
@@ -169,7 +169,7 @@ namespace SubtitleSystem
             {
                 speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
                 subBase.subtitleReader.incrementTime();
-                playerAngle = processAngle(player.GetComponent<MoveRobot>().playerYAngle);
+                playerAngle = player.GetComponent<MoveRobot>().playerYAngle % 360.0f;
                 String speakerPos = playerViewContains(speakerTag, playerAngle);
                 speakerPosText.text = "speakerPos: " + speakerPos;
                 if (subtitlesTriggered)
@@ -368,13 +368,14 @@ namespace SubtitleSystem
                     }
                 }
                 speakerAngleText.text = ("justSpeakerAngle: " + justSpeakerAngle);
-                UnityEngine.Debug.Log(player.GetComponent<MoveRobot>().playerYAngle);
-                float tempPlayerAngle = ((360 / (2 * Mathf.PI) * player.transform.rotation.y % (360.0f)));
-                if (tempPlayerAngle < 0)
-                {
-                    tempPlayerAngle += 360.0f;
-                }
-                playerYAngleText.text = "play Y angle: " + tempPlayerAngle;
+                UnityEngine.Debug.Log(360.0f - (player.transform.rotation.y % (360.0f)));
+                //float tempPlayerAngle = ((360 / (2 * Mathf.PI) * player.transform.rotation.y % (360.0f)));
+                //if (tempPlayerAngle < 0)
+                //{
+                //    tempPlayerAngle += 360.0f;
+                //}(player.transform.rotation.y * (180.0f/(Mathf.PI))) % (360.0f));
+                playerYAngleText.text = "play Y angle: " + player.GetComponent<MoveRobot>().playerYAngle;
+                playerZAngleText.text = "playerZ: " + player.transform.rotation.z;
                 return fullCircleConvert(speakerAngle);
             }
             UnityEngine.Debug.Log("speaker null: ");
@@ -389,16 +390,16 @@ namespace SubtitleSystem
             ///GRar
             ///i mean what if we like seeprate this class into angle subtitles main setting class and helper classes...
             ///in an attemot to do this, i exported the version _Before_ attempting this on 1/21/2021, labeled and COmplexSubtitleSystem with said date
-            if (Speaker != null)
+            if (Speaker != null && Speaker != player) //situation where the speaker is the player??
             {
                 //if theres no distance, it counts as looking at the speaker--implement
                 speakerZ = Speaker.transform.position.z;
                 speakerX = Speaker.transform.position.x;
                 playerZ = player.transform.position.z;
                 playerX = player.transform.position.x;
-                //speakerAngle = (180.0f / Mathf.PI) * (Mathf.Atan(Math.Abs(speakerZ - playerZ) / Math.Abs(speakerX - playerX)));
-                //speakerAngle %= (360.0f);
-                playerAngle = player.transform.rotation.z % (360.0f);
+                speakerAngle = (180.0f / Mathf.PI) * (Mathf.Atan(Math.Abs(speakerZ - playerZ) / Math.Abs(speakerX - playerX)));
+                speakerAngle %= (360.0f);
+                playerAngle = player.GetComponent<MoveRobot>().playerYAngle % (360.0f);
                 //the coefficent converst it to degrees, which i think are easier to sdeall with in grid form
                 //perhaps try to trouble shoot by puttingn aline at the player angle angle??
                 if ((speakerAngle - playerAngle)>180.0f)
@@ -538,7 +539,7 @@ namespace SubtitleSystem
                 UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
                 UnityEngine.Debug.Log("x: " + x);
                 UnityEngine.Debug.Log("y: " + y);
-                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
+                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - playerAngle));
                 
             }
             Compass.SetActive(setting);
@@ -557,10 +558,10 @@ namespace SubtitleSystem
                 //negative speaker agles should have negative compass angle too
                 //modifying the Vector3, based on input multiplied by speed and time
                 UnityEngine.Debug.Log("justSpeakerAngle: " + justSpeakerAngle);
-                UnityEngine.Debug.Log("playerYAngle: " + player.GetComponent<MoveRobot>().playerYAngle);
+                UnityEngine.Debug.Log("playerYAngle: " + playerAngle);
                 UnityEngine.Debug.Log("x: " + x);
                 UnityEngine.Debug.Log("y: " + y);
-                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - player.GetComponent<MoveRobot>().playerYAngle));
+                Compass.transform.rotation = Quaternion.Euler(new Vector3(x, y, justSpeakerAngle - playerAngle));
 
             }
             Compass.SetActive(setting);
