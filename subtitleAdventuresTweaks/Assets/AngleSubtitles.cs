@@ -377,9 +377,7 @@ namespace SubtitleSystem
                 speakerAngle = Mathf.Abs(justSpeakerAngle);
                 UnityEngine.Debug.Log(360.0f - (player.transform.rotation.y % (360.0f)));
                 //float tempPlayerAngle = ((360 / (2 * Mathf.PI) * player.transform.rotation.y % (360.0f)));
-                //if (tempPlayerAngle < 0)
-                //{
-                //    tempPlayerAngle += 360.0f;
+               
                 //}(player.transform.rotation.y * (180.0f/(Mathf.PI))) % (360.0f));
                 playerAngle =  Mathf.Abs(player.GetComponent<MoveRobot>().playerYAngle) % 360.0f;
                 playerYAngleText.text = "play Y angle: " + Mathf.Abs(player.GetComponent<MoveRobot>().playerYAngle) %360.0f;
