@@ -37,16 +37,24 @@ namespace SubtitleSystem
 
 		void Update()
 		{
-			
+
 			if (Input.GetKey(KeyCode.A))
 			{
 				transform.Rotate(0.0f, -2.0f, 0.0f, Space.Self);
 				playerYAngle += 2.0f;
+				if (playerYAngle >= 360.0f)
+				{
+					playerYAngle %= 360.0f;
+				}
 			}
 			if (Input.GetKey(KeyCode.D))
 			{
 				transform.Rotate(0.0f, 2.0f, 0.0f, Space.Self);
 				playerYAngle -= 2.0f;
+				if (playerYAngle < 0.0f)
+                {
+					playerYAngle += 360.0f;
+                }
 			}
 			cameraFollow();
 			Move();
@@ -56,7 +64,7 @@ namespace SubtitleSystem
 			}
 		}
 
-		private void Move()
+		public void Move()
 		{
 			float moveForwardAndBackward = Input.GetAxis("Vertical");
 			if (Input.GetKey(KeyCode.W))
