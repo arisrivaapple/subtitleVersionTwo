@@ -33,7 +33,7 @@ namespace SubtitleSystem
         //ive always had a bit of toruble with scope
         //shouof check the scope of everythign to seee that nothing is brpader scope than it needs to be so it doesnt interfere t=with the user's rpogram
         private LineRenderer line;
-        public TextMeshProUGUI speakerAngleText, justSpeakerText, playerZAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
+        public TextMeshProUGUI speakerAngleText, TimerText, justSpeakerText, playerZAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
         public GameObject leftArrow;
         public GameObject rightArrow;
         public Boolean speakerArrows;
@@ -129,7 +129,7 @@ namespace SubtitleSystem
             mostRecentSpeaker = player; //still feels like weird "fix"
             speakerFaced = false;
             speakerTag = "";
-            allowance = 35.0f;
+            allowance = 30.0f;
 
             line = this.gameObject.AddComponent<LineRenderer>();
             // Set the width of the Line Renderer
@@ -152,7 +152,7 @@ namespace SubtitleSystem
                 {
                     subBase = new SubtitleBase(subtitlesBox, subtitleFile);
                     subBase.assignDict();
-                    subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed);
+                    mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed;
                     subBase.assignDict();//thhis is only here bc for some reason subtitle base runs Before main??
                     triggeredOnce = true;
                     subtitlesTriggered = true;
@@ -171,6 +171,7 @@ namespace SubtitleSystem
             {
                 speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
                 subBase.subtitleReader.incrementTime();
+                TimerText.text = subBase.subtitleReader.getInternalTime() + "";
                 playerAngle = (player.GetComponent<MoveRobot>().playerYAngle) % 360.0f;
                 String speakerPos = playerViewContains(speakerTag, playerAngle);
                 speakerPosText.text = "speakerPos: " + speakerPos;
@@ -215,7 +216,7 @@ namespace SubtitleSystem
                         speakerFaced = false;
                         processSpeakerArrows(false, speakerPos);
                         speechBubble.SetActive(false);
-                        subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed); //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
+                        mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().speakerFacingSpeed; ; //when there's a break in the subtittlwa, thew siubtitle speed speeds up to speakerFacingSpeed
                         lightSpeaker(false);
                         changeText(false);
                         setCompass(false);
@@ -240,7 +241,7 @@ namespace SubtitleSystem
                         else if (Equals("true", speakerPos)) //what difference should there be between facing and seeing and just facing??
                         {
                             speakerFaced = true;
-                            subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed);
+                            mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().speakerFacingSpeed;
                             processSpeakerArrows(false, speakerPos);
                             if (mainCamr.GetComponent<Main>().highlightSpeaker) { lightSpeaker(true); } else { lightSpeaker(false); }
                         }
@@ -248,7 +249,7 @@ namespace SubtitleSystem
                         {
                             speakerFaced = false;
                             lightSpeaker(false); //not facing speaker so all lights off whether triggered or not
-                            if (mainCamr.GetComponent<Main>().slowGameWhenNotLookingAtSpeaker) { subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed); } 
+                            if (mainCamr.GetComponent<Main>().slowGameWhenNotLookingAtSpeaker) { mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed; } 
                             if (mainCamr.GetComponent<Main>().showSpeakerArrows) { processSpeakerArrows(true, speakerPos); } else {processSpeakerArrows(false, speakerPos); } // subtitle background
                         }
                     }
@@ -259,7 +260,7 @@ namespace SubtitleSystem
                             speakerFaced = false;
                         //could just have a fiunction that did all the updates related to speakerFaced?
                         double tempor = mainCamr.GetComponent<Main>().speakerFacingSpeed;
-                        subBase.subtitleReader.setInternalTimerRate(mainCamr.GetComponent<Main>().speakerFacingSpeed);
+                        mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().speakerFacingSpeed;
                         Speaker = null;
                         speakerTag = "";
                         subtitlesTriggered = false;

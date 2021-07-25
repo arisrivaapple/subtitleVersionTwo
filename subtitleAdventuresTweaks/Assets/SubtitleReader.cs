@@ -14,9 +14,9 @@ namespace SubtitleSystem
     {
         //stop two subttitles playing at once
         //also add waarning if subtitles in file might pla at th esaame time
-        //we keep these as double insteadof ints to help facilitate fine tunign of the speed
-        public double timer;
-        public double internalTimerRate;
+        //we keep uble these as double insteadof ints to help facilitate fine tunign of the speed
+        public float timer;
+        public float internalTimerRate;
         public string speaker;
         public TextAsset subtitleText;
         public Queue<Subtitle> subtitleQueue;
@@ -33,8 +33,8 @@ namespace SubtitleSystem
         {
             mainc = GameObject.Find("Main Camera");
             player = GameObject.Find("player");
-            timer = 0.0;
-            internalTimerRate = 0.000001;
+            timer = 0.0f;
+            internalTimerRate = 1000.0f * Time.deltaTime;
             //set this back to null after testing
             speaker = "";
             subtitleQueue = new Queue<Subtitle>();
@@ -159,23 +159,23 @@ namespace SubtitleSystem
         }
 
         //change to version of increment itme
-        public void incrementTime(double incrementTimeBy)
+        public void incrementTime(float incrementTimeBy)
         {
             timer += incrementTimeBy;
         }
 
-        public double getInternalTime()
+        public float getInternalTime()
         {
             return timer;
         }
 
-        public void setInternalTimerRate(double newRate)
+        public void setInternalTimerRate(float newRate)
         {
             internalTimerRate = newRate;
         }
 
         //im nto sure if we'll actually need to use this method
-        public double getInternalTimerRate()
+        public float getInternalTimerRate()
         {
             return internalTimerRate;
         }

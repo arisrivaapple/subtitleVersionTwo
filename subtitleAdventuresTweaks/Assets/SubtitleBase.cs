@@ -17,7 +17,7 @@ namespace SubtitleSystem
         public string speakerTemp;
         public GameObject mainc;
         public SubtitleReader subtitleReader = null;
-        public int t;
+        public float t;
         public Dictionary<string, Color> tempUselessDictionary;
         public string currLine;
         public TextMeshProUGUI subBox;
@@ -26,7 +26,7 @@ namespace SubtitleSystem
         public SubtitleBase(TextMeshProUGUI sbBox, TextAsset subtitles)
         {
             mainc = GameObject.Find("Main Camera");
-            t = 0;
+            t = 0.0f;
             subtitleReader = new SubtitleReader(subtitles.ToString()); //ddoes the subtitle reader need access to the text box?
             subBox = sbBox;
             //okay so this seems to run before main for know known reasons?
@@ -40,11 +40,11 @@ namespace SubtitleSystem
         public void UpdateSubtitleBase()
         {
             place = mainc.GetComponent<Main>().subtitleFontSize;
-            subtitleReader.incrementTime(0.25);
+            subtitleReader.incrementTime();
             if (true) //previously if tempUselessDictionary != null
             {
                 //i think one of my main problems is that the code goes in a werid order and htat causes null exception mistakes
-                if (t % 1000 == 0)
+                if (t % 1000 == 0) //you can be more precise in timing by lowering the number here
                 {
                     //subtitleReader.incrementTime(100);
                     if (!subtitleReader.shouldProgramEnd())
@@ -82,7 +82,7 @@ namespace SubtitleSystem
                     }
 
                 }
-                t += 10;
+                t += 1000.0f * Time.deltaTime; //frame rate per SECOND, so t is one second divided by the frame rate
             }
         }
     }

@@ -26,8 +26,9 @@ namespace SubtitleSystem
         public Boolean slowGameWhenNotLookingAtSpeaker;
         public Boolean subtitleBackground;
         public Boolean silhouettes;
-        public double speakerFacingSpeed;
-        public double nonSpeakerFacingSpeed;
+        public float currentSpeed;
+        public float speakerFacingSpeed;
+        public float nonSpeakerFacingSpeed;
         public int subtitleFontSizeDif;
         public int subtitleFontSize;
         public GameObject subtitleCanvasObject;
@@ -45,8 +46,9 @@ namespace SubtitleSystem
         public Boolean subtitlesOn;
         void Start()
         {
-            speakerFacingSpeed = 10.0f;
-            nonSpeakerFacingSpeed = 5.0f;
+            //obviously people will adjust this based on how their player moves, but should the player be able to rotate the same speed when the rest of the game is slowed down to try to locatioe the speaker?
+            speakerFacingSpeed = 1.0f;
+            nonSpeakerFacingSpeed = 0.5f;
             textBackground = null;
             subtitleFontSize= 60;
             subtitleFontSizeDif = 0;
