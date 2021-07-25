@@ -147,11 +147,11 @@ namespace SubtitleSystem
             {
                 //it keeps saying that main isnt declared for some reason
                 //so im going to assign the thing to a boolean instead
-                Boolean subs = !(mainCamr.GetComponent<Main>().subtitlesOn);
+                Boolean subs = !(mainCamr.GetComponent<Main>().subtitlesOn); //im worried what would happen with this line if a differenct (or the same?) instance of subitles were runnign?
                 if ((!triggeredOnce || repeated) && subs)
                 {
                     subBase = new SubtitleBase(subtitlesBox, subtitleFile);
-                    subBase.assignDict();
+                    //write check for next line
                     mainCamr.GetComponent<Main>().currentSpeed = mainCamr.GetComponent<Main>().nonSpeakerFacingSpeed;
                     subBase.assignDict();//thhis is only here bc for some reason subtitle base runs Before main??
                     triggeredOnce = true;
