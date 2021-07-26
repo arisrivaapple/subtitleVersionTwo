@@ -11,121 +11,82 @@ using UnityEngine.UI;
 using System.Diagnostics;
 using TMPro;
 
-//COMPARE SPEAKER ANGLE TO 0 TO GET PROPER ANGLE
-
-//im unsure whether its better form to keep the scope of the variables smaller and incorporate the like arrows and compass in here, 
-//or if i sshould have that stuff in seperate scripts
-//i think im supposed to create a function that will share the necessasry info with y other scripts
-//but i should check
-
-
-//to add: be able to move subtitles around (for blind spots and stuff)
-//change text
-//speed down speech too long with subtitles, without making soeech incomprehensivble???
-
-//maybeb a should include having sound come from the assigned gameobject speaker spoemwherre in here, though it's not my first priority
 namespace SubtitleSystem
 {
-    public class AngleSubtitles : MonoBehaviour //hopefully i can
+    public class AngleSubtitles : MonoBehaviour 
     {
-        //i probably shouldnt have all my variables public, but in unity its useful for debugging
-        //what should i change in the release version?
-        //ive always had a bit of toruble with scope
-        //shouof check the scope of everythign to seee that nothing is brpader scope than it needs to be so it doesnt interfere t=with the user's rpogram
-        private LineRenderer line;
-        public TextMeshProUGUI speakerAngleText, TimerText, justSpeakerText, playerZAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText;
-        public GameObject leftArrow;
-        public GameObject rightArrow;
-        public Boolean speakerArrows;
-        public double internalTime;
-        public Boolean triggeredOnce;
-        public TextMeshProUGUI subtitlesBox;
-        public GameObject Compass;
-        public Vector3 compassCurrentEulerAngles;
-        public Quaternion compassCurrentRotation;
-        public TextAsset subtitleFile;
-        public SubtitleBase subBase;
-        public float justSpeakerAngle;
-        public float defaultFloat;
-        //replacement encapselating class like "Basic Subtitle" used to be
-        public Boolean subtitlesTriggered;
-        public Boolean repeated; //mark this as true in start if you want the diolouge to be repeated on each collision
-        //there could also be an option where ppl didnt actuly move their speech until you foud them. t could be kinda a cool thing if you had super powers or something
-        //a big question is what to do if more than one person is speaking
-        //should the text speed wait 'till you've looked at both of them?
-        public Quaternion speakerCurrentRotation;
-        public Vector3 speakerCurrentEulerAngles;
+        //text for debugging;
+        public TextMeshProUGUI speakerAngleText, TimerText, TText, justSpeakerText, playerZAngleText, speakerPosText, playerYAngleText, totalFinalAngleText, fillCircleConvertAngleText, speedText;
+
         public GameObject player;
         public GameObject Speaker;
-        public float playerAngle;
+
+        public SubtitleBase subBase;
+        public TextMeshProUGUI subtitlesBox;
+        public TextAsset subtitleFile;
+
+        public Boolean triggeredOnce;
+        public Boolean subtitlesTriggered;
+        public Boolean repeated; //mark this as true in start if you want the diolouge to be repeated on each collision
+
         public Boolean speakerFaced;
+        public float playerAngle;
         public float speakerAngle;
+        public float justSpeakerAngle;
+        public float defaultFloat;
         public float speakerZ;
         public float speakerX;
         public float playerZ;
-        public TextMeshProUGUI speedText;
-        public GameObject mostRecentSpeakerLight;
-        public GameObject speechBubble;
         public float playerX;
+
+        public Collider speakerCollider;
+        public RaycastHit targetHit;
+
+        public GameObject speechBubble;
+
+        public GameObject mostRecentSpeakerLight;
+
+        public GameObject compassBackground;
+        public GameObject Compass;
+
         public GameObject textBackground;
         public GameObject mostRecentSpeaker;
         public Boolean needToSeeSpeaker;
+
         public Material silhouetteMaterial;
         public Material nonSilhouetteMaterial;
-        //measured in degrees away from facing the speaker straight on are considered "facing the speaker"
-        //it would be possible for the player's view to snap towards the speaker
-        //also, maybe it would be beneficial for the speaaker to glow
-        //(it would be helpful for location)
-        //but also once you were facing them, you could be sure you knew who was talking
         public double internalTimeRate;
-        //the name o fthe person talking
-        //null is used to show that no one is talking
-        //if you want to show the speaker's name in the subititles, you write theyre name twice
-        public string speakerTag;
-        public GameObject mainCamr;
-        //I definately want to see if there's a better way to do this, but for now we're tracking
-        //the angles of the player n a seperate field
-        //so we can see what direction the player is facing
-        //for finding if the speaker is withing the allowance
-        //not that this is in this part of the code--im just noting that we need to do that
-        //bc yeah there might be an eaasier way to do this
-        //but for now ill use trig to calcualte the angle a speaker is from the plarer
-        //using the difference in positions between the player and speaker
-        /// will we be okay instantiating one of these for every set of subtitles?
-        
-        public float allowance;
-        public Collider speakerCollider;
-        public RaycastHit targetHit;
+
         public Vector3 playerForward;
         public float x;
         public float y;
-
-        //again it seems there should be a bteeer why t locate ui elemetns than dputting in  a game object
-        public GameObject subtitleCanvasObject;
         public Canvas subtitleDisplay;
 
+        public string speakerTag; //the name o fthe person talkin--null is used to show that no one is talking
+        public GameObject mainCamr;
+        
+        public float allowance;
 
-        public GameObject compassBackground;
-        //get rid of lingering text
+        private LineRenderer line;
+
+        public GameObject leftArrow;
+        public GameObject rightArrow;
 
         void Start()
         {
             Speaker = player;
-            subtitleDisplay = GameObject.Find("Main Camera").GetComponent<Main>().subtitleDisplay;
-            //way to get arrow without assigning in inspector?
-            speakerArrows = true;
             mainCamr = GameObject.Find("Main Camera");
+            subtitleDisplay = mainCamr.GetComponent<Main>().subtitleDisplay;
             triggeredOnce = false;
             repeated = false;
             subtitlesTriggered = false;
             Speaker = player;
+
             //HERE THE CODE SHOULD BE EDITED DEPENDING ON WHAT PLAYER MOVEMENT YOU USE
             //"plsyerAngle" SHOULD CONTAIN THE PLAYERS ROTATION AORUND THE Y AXIS IN DEGREES
-            //for our functionality: dont forget to write the code to keep our playerRotstion w=under 360 degrees and correctlky formatted
             playerAngle = (player.GetComponent<MoveRobot>().playerYAngle) % 360.0f;//will this update as the variable updates?
-            //i dont think so
-            //decide if we want another class for the basic sbtitle displaer stuff
-            ///we assume that initially the player isnt facing the speaker
+
+            ///we assume that initially the player isnt facing the speaker--maybe assume that they are??
             mostRecentSpeaker = player; //still feels like weird "fix"
             speakerFaced = false;
             speakerTag = "";
@@ -163,7 +124,6 @@ namespace SubtitleSystem
 
         void Update()
         {
-            
             speakerAngle = getSpeakerAngle();
             if (mostRecentSpeaker != Speaker) { showSilhouette(false);}
 
@@ -171,7 +131,8 @@ namespace SubtitleSystem
             {
                 speedText.text = (subBase.subtitleReader.getInternalTimerRate()).ToString();
                 subBase.subtitleReader.incrementTime();
-                TimerText.text = subBase.subtitleReader.getInternalTime() + "";
+                TimerText.text = "Subtitle Reader timer: " +  subBase.subtitleReader.getInternalTime() + "";
+                TText.text = "Subtitle Base T: " + subBase.t;
                 playerAngle = (player.GetComponent<MoveRobot>().playerYAngle) % 360.0f;
                 String speakerPos = playerViewContains(speakerTag, playerAngle);
                 speakerPosText.text = "speakerPos: " + speakerPos;
@@ -200,13 +161,9 @@ namespace SubtitleSystem
                             y = Speaker.transform.rotation.y;
                             z = Speaker.transform.rotation.z;
 
-                            //modifying the Vector3, based on input multiplied by speed and time
-                            speakerCurrentEulerAngles = new Vector3(0, 0, Compass.transform.rotation.z);//heck if theres initital rotation
-
-                            //apply the Quaternion.eulerAngles change to the gameObject
-                            speechBubble.transform.rotation = Quaternion.Euler(speakerCurrentEulerAngles);
+                            speechBubble.transform.rotation = Quaternion.Euler(new Vector3(0, 0, Compass.transform.rotation.z)); //modifying the Vector3, based on input multiplied by speed and time, apply the Quaternion.eulerAngles change to the gameObject
                         }
-                        
+
                         showSilhouette(false);
                     }
 
@@ -433,12 +390,7 @@ namespace SubtitleSystem
                     return "left";
                 }
             }
-            return "null"; //as in seaker null
-            //use raycast? so its clear that the player has a direct line of site to the speaker?
-            //though, an alternative would be to ust have player.foward +- allowance == angle between player and speaker
-            //which would be useful if speakers were behind objects...
-            //alternativelyy, if the speakers were behind objects, there could be a silloette of the speaker
-            //perhaps that could be toggled on and of*/ 
+            return "null"; 
         }
 
         public float fullCircleConvert(float origAngle)

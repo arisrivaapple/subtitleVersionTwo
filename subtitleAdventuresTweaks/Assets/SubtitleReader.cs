@@ -23,6 +23,7 @@ namespace SubtitleSystem
         public Button speakerToggleButton;
         public GameObject player;
         public GameObject mainc;
+        public Subtitle nextSubtitle;
         //system for keeping the color of a speaker while showing questions marks
         //maybe if they put a question mark before the speaker part in srt?
         //i dont love it because its nto standard but it should work
@@ -110,7 +111,7 @@ namespace SubtitleSystem
             //the times of the subtiitles should include people speaking at the same time with 
             //them bboth being incorporated into subtitle piritions
             //is there any reason I should ditcht the subtitle objects as soon as they;re read?
-            Subtitle nextSubtitle = (Subtitle)subtitleQueue.Peek();
+            nextSubtitle = (Subtitle)subtitleQueue.Peek();
             //substitles need to be createed and sdestroyed version:
             //would it be better form dto do a range here?
             if (subtitleQueue.Count > 0)

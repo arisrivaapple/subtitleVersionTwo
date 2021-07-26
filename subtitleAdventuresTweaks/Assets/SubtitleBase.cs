@@ -44,11 +44,11 @@ namespace SubtitleSystem
             if (true) //previously if tempUselessDictionary != null
             {
                 //i think one of my main problems is that the code goes in a werid order and htat causes null exception mistakes
-                if (t % 1000 == 0) //you can be more precise in timing by lowering the number here
+                if (true) //you can be more precise in timing by lowering the number here --ALSO MAKE THID A RANGE INSTEAD 
                 {
                     //subtitleReader.incrementTime(100);
                     if (!subtitleReader.shouldProgramEnd())
-                    {
+                     {
                         //WHY IS THIS PROCESSED BEFORE ITS CALLED??????
                         //im leaning towards not mmaking names a second color my default
 
