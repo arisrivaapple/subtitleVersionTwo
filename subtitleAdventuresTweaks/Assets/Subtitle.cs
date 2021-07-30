@@ -13,10 +13,7 @@ namespace SubtitleSystem
 {
 	public class Subtitle
 	{
-		//therhetically we could keep this all in int
-		//and have a method to transform back into stirng for the reader
-		//but since we're getting it froma a string anyway
-		public String startTime;
+		public String startTime; //times will be imported as strings from srt file to begin with anyway
 		public int startTimeInt;
 		public String endTime;
 		public int endTimeInt;
@@ -25,8 +22,6 @@ namespace SubtitleSystem
 
 		public Subtitle()
 		{
-			//are these assignments necessary??
-			//also, instantiating hte ints as -1 doesnt feel quite correct
 			startTime = null;
 			startTimeInt = -1;
 			endTime = null;
@@ -39,11 +34,6 @@ namespace SubtitleSystem
 		{
 			startTime = timeInfo.Substring(0, 12);
 			endTime = timeInfo.Substring(17, 12);
-			//it seems that this code maay take mor ethan a few milliseconds to run
-			//which means that probably i should try to calculate that into the unternal timer?
-			//or at least have less rpecise time stamps and have the update cycle less frequently than every milisecond
-			//since update isnt called a set number of frames per muinute or whatever
-			//we convert the trime to a basic int
 			int hoursStart = Int32.Parse(timeInfo.Substring(0, 2));
 			int minutesStart = Int32.Parse(timeInfo.Substring(3, 2));
 			int secondsStart = Int32.Parse(timeInfo.Substring(6, 2));
@@ -59,9 +49,8 @@ namespace SubtitleSystem
 
 		public void inputTextInfo(String textInfo)
 		{
-			//there might be an easier way to do this, but im trying to find the last ] in the string
-			//ii should probably add a provision for if ppl want to use brackets in their si=ubtitles
-			int lastBracketIndex = -1; //this is before it gets assigned in the loop. will throw exception if there is no last bracket
+			
+			int lastBracketIndex = -1; //this is before it gets assigned in the loop. will throw exception if there is no last bracket (do I need this assignment?)
 			
 			//split with space between bracketed names or notes
 			//so that double brackets liek two names or [/?][Name] (the function to keep a name annoymous

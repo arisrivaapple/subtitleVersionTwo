@@ -29,7 +29,6 @@ namespace SubtitleSystem
             t = 0.0f;
             subtitleReader = new SubtitleReader(subtitles.ToString()); //ddoes the subtitle reader need access to the text box?
             subBox = sbBox;
-            //okay so this seems to run before main for know known reasons?
         }
 
         public void assignDict()
@@ -41,22 +40,17 @@ namespace SubtitleSystem
         {
             place = mainc.GetComponent<Main>().subtitleFontSize;
             subtitleReader.incrementTime();
-            if (true) //previously if tempUselessDictionary != null
+            if (true)
             {
                 //i think one of my main problems is that the code goes in a werid order and htat causes null exception mistakes
                 if (true) //you can be more precise in timing by lowering the number here --ALSO MAKE THID A RANGE INSTEAD 
                 {
-                    //subtitleReader.incrementTime(100);
                     if (!subtitleReader.shouldProgramEnd())
                      {
-                        //WHY IS THIS PROCESSED BEFORE ITS CALLED??????
-                        //im leaning towards not mmaking names a second color my default
-
                         currLine = subtitleReader.readSubtitles();
 
                         //we use null instead of vblank lines when someone isnt speaking
-                        //because sometimes ppl might want to have a speaker's name, but not saying anything
-                        //like ...
+                        //because sometimes ppl might want to have a speaker's name, but not saying anything, like "..."
                         if (currLine != null)
                         {
                             subBox.text = currLine;
